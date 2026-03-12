@@ -1,102 +1,148 @@
-import {DarkTheme, DefaultTheme, ThemeProvider, useTheme} from "@react-navigation/native";
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import React from "react";
-import {NativeTabs} from "expo-router/unstable-native-tabs";
-import {useSchedule} from "@/context/ScheduleContext";
-import {useRouter} from "expo-router";
-import {Ionicons} from "@expo/vector-icons";
-
+import { useTheme } from "@react-navigation/native";
+import {Platform, View, Image} from 'react-native';
+import React, {useEffect} from "react";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { useSchedule } from "@/context/ScheduleContext";
+import {Redirect, Tabs} from "expo-router";
 
 export default function TabLayout() {
-    const {colors} = useTheme();
-    const {savedClasses, isLoading} = useSchedule();
-    const router = useRouter();
+    const { colors } = useTheme();
+    const { savedClasses, isLoading } = useSchedule();
 
     if (isLoading) {
-        return <View style={{flex: 1, backgroundColor: colors.background}}/>;
+        return <View style={{ flex: 1, backgroundColor: colors.background }} />;
     }
 
     const isPlanEmpty = savedClasses.length === 0;
-    const activeDays = new Set(savedClasses.map(c => c.day));
 
-    return (
-        <NativeTabs>
-            <NativeTabs.Trigger name="monday">
-                <NativeTabs.Trigger.Label>Poniedz.</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    src={require('@/assets/images/tabIcons/home.png')}
-                    renderingMode="template"
-                />
-            </NativeTabs.Trigger>
+    if (Platform.OS === "ios") {
+        return (
+            <NativeTabs
+                labelVisibilityMode="unlabeled"
+                hidden={isPlanEmpty}
+            >
+                {/*{activeDays.has('Poniedziałek') && (*/}
+                <NativeTabs.Trigger name="monday"
+                    // hidden={!activeDays.has('Poniedziałek')}
+                >
+                    <NativeTabs.Trigger.Label
+                        hidden={true}
+                    >Poniedz.</NativeTabs.Trigger.Label>
+                    <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/pn.png')} renderingMode="template" />
+                </NativeTabs.Trigger>
+                {/*)}*/}
 
-            <NativeTabs.Trigger name="tuesday">
-                <NativeTabs.Trigger.Label>Wtorek</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    src={require('@/assets/images/tabIcons/home.png')}
-                    renderingMode="template"
+                {/*{activeDays.has('Wtorek') && (*/}
+                <NativeTabs.Trigger name="tuesday"
+                    // hidden={!activeDays.has('Wtorek')}
+                >
+                    <NativeTabs.Trigger.Label hidden={true}>Wtorek</NativeTabs.Trigger.Label>
+                    <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/wt.png')} renderingMode="template" />
+                </NativeTabs.Trigger>
+                {/*)}*/}
+
+                {/*{activeDays.has('Środa') && (*/}
+                <NativeTabs.Trigger name="wednesday"
+                    // hidden={!activeDays.has('Środa')}
+                >
+                    <NativeTabs.Trigger.Label hidden={true}>Środa</NativeTabs.Trigger.Label>
+                    <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/sr.png')} renderingMode="template" />
+                </NativeTabs.Trigger>
+
+                {/*{activeDays.has('Czwartek') && (*/}
+                <NativeTabs.Trigger name="thursday"
+                    // hidden={!activeDays.has('Czwartek')}
+                >
+                    <NativeTabs.Trigger.Label hidden={true}>Czwartek</NativeTabs.Trigger.Label>
+                    <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/cz.png')} renderingMode="template" />
+                </NativeTabs.Trigger>
+                {/*)}*/}
+
+                {/*{activeDays.has('Piątek') && (*/}
+                <NativeTabs.Trigger name="friday"
+                    // hidden={!activeDays.has('Piątek')}
+                >
+                    <NativeTabs.Trigger.Label hidden={true}>Piątek</NativeTabs.Trigger.Label>
+                    <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/pt.png')} renderingMode="template" />
+                </NativeTabs.Trigger>
+                {/*)}*/}
+            </NativeTabs>
+        )
+    } else {
+        return (
+            <Tabs
+                screenOptions={{
+                    tabBarStyle: isPlanEmpty ? { display: 'none' } : undefined,
+                    tabBarShowLabel: false,
+                    headerShown: false,
+                }}
+            >
+                <Tabs.Screen
+                    name="monday"
+                    options={{
+                        title: 'Poniedz.',
+                        tabBarIcon: ({ color, size }) => (
+                            <Image
+                                source={require('@/assets/images/weekIconsPL/pn.png')}
+                                style={{ width: 30, height: 30, tintColor: color }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
                 />
-            </NativeTabs.Trigger>
-            <NativeTabs.Trigger name="wednesday">
-                <NativeTabs.Trigger.Label>Środa</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    src={require('@/assets/images/tabIcons/home.png')}
-                    renderingMode="template"
+                <Tabs.Screen
+                    name="tuesday"
+                    options={{
+                        title: 'Wtorek',
+                        tabBarIcon: ({ color, size }) => (
+                            <Image
+                                source={require('@/assets/images/weekIconsPL/wt.png')}
+                                style={{ width: 30, height: 30, tintColor: color }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
                 />
-            </NativeTabs.Trigger>
-            <NativeTabs.Trigger name="thursday">
-                <NativeTabs.Trigger.Label>Czwartek</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    src={require('@/assets/images/tabIcons/home.png')}
-                    renderingMode="template"
+                <Tabs.Screen
+                    name="wednesday"
+                    options={{
+                        title: 'Środa',
+                        tabBarIcon: ({ color, size }) => (
+                            <Image
+                                source={require('@/assets/images/weekIconsPL/sr.png')}
+                                style={{ width: 30, height: 30, tintColor: color }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
                 />
-            </NativeTabs.Trigger>
-            <NativeTabs.Trigger name="friday">
-                <NativeTabs.Trigger.Label>Piątek</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    src={require('@/assets/images/tabIcons/home.png')}
-                    renderingMode="template"
+                <Tabs.Screen
+                    name="thursday"
+                    options={{
+                        title: 'Czwartek',
+                        tabBarIcon: ({ color, size }) => (
+                            <Image
+                                source={require('@/assets/images/weekIconsPL/cz.png')}
+                                style={{ width: 30, height: 30, tintColor: color }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
                 />
-            </NativeTabs.Trigger>
-        </NativeTabs>
-    )
+                <Tabs.Screen
+                    name="friday"
+                    options={{
+                        title: 'Piątek',
+                        tabBarIcon: ({ color, size }) => (
+                            <Image
+                                source={require('@/assets/images/weekIconsPL/pt.png')}
+                                style={{ width: 30, height: 30, tintColor: color }}
+                                resizeMode="contain"
+                            />
+                        ),
+                    }}
+                />
+            </Tabs>
+        )
+    }
 }
-
-const styles = StyleSheet.create({
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 32,
-    },
-    emptyTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 12,
-        textAlign: 'center',
-    },
-    emptySubtitle: {
-        fontSize: 16,
-        opacity: 0.6,
-        textAlign: 'center',
-        marginBottom: 32,
-        lineHeight: 24,
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#4F46E5',
-        paddingVertical: 14,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        shadowColor: '#4F46E5',
-        shadowOffset: {width: 0, height: 4},
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});

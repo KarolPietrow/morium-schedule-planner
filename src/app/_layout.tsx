@@ -16,21 +16,12 @@ export default function RootLayout() {
 
 function MainLayout() {
     const colorScheme = useColorScheme();
-    const { savedClasses, isLoading } = useSchedule();
-
-    const isPlanEmpty = savedClasses.length === 0;
 
     useEffect(() => {
         if (Platform.OS === 'android') {
             NavigationBar.setStyle(colorScheme === 'dark' ? 'dark' : 'light');
         }
     }, [colorScheme]);
-
-    // useEffect(() => {
-    //     if (isPlanEmpty) {
-    //         if (router.scree)
-    //     }
-    // }, [isPlanEmpty]);
 
     return (
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

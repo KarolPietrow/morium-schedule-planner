@@ -8,11 +8,10 @@ import { useSchedule } from '@/context/ScheduleContext';
 export default function Index() {
     return <Redirect href="/(tabs)/monday" />;
 
-
     // const { colors } = useTheme();
     // const { savedClasses, isLoading } = useSchedule();
     // const router = useRouter();
-    //
+
     // if (isLoading) {
     //     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
     // }
