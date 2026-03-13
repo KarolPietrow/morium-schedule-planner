@@ -219,7 +219,14 @@ export default function ManageScreen() {
                                     onChangeText={setSearchQuery}
                                 />
                                 {isLoadingSchedules ? (
-                                    <ActivityIndicator size="large" color="#4F46E5" style={{ marginTop: 20 }} />
+                                    <View
+                                    style = {[{alignSelf: "center"}]}
+                                        >
+                                        <ActivityIndicator size="large" color="#4F46E5" style={{ marginTop: 20 }} />
+                                        <Text style={[{ color: colors.text}]}>
+                                            Łączenie z serwerami Moria...
+                                        </Text>
+                                    </View>
                                 ) : (
                                     <FlatList
                                         data={filteredSchedules}
