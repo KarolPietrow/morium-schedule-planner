@@ -34,7 +34,9 @@ export default function DayView({ dayName }: DayViewProps) {
 
     const isPlanEmpty = savedClasses.length === 0;
 
-    const dayClasses = savedClasses.filter(c => c.day === dayName);
+    const dayClasses = savedClasses
+        .filter(c => c.day === dayName)
+        .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
     let minHour = 10;
     let maxHour = 20;
