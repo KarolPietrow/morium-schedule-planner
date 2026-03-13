@@ -21,51 +21,30 @@ export default function TabLayout() {
                 labelVisibilityMode="unlabeled"
                 hidden={isPlanEmpty}
             >
-                {/*{activeDays.has('Poniedziałek') && (*/}
-                <NativeTabs.Trigger name="monday"
-                    // hidden={!activeDays.has('Poniedziałek')}
-                >
-                    <NativeTabs.Trigger.Label
-                        hidden={true}
-                    >Poniedz.</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger name="monday">
+                    <NativeTabs.Trigger.Label hidden={true}>Poniedziałek</NativeTabs.Trigger.Label>
                     <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/pn.png')} renderingMode="template" />
                 </NativeTabs.Trigger>
-                {/*)}*/}
 
-                {/*{activeDays.has('Wtorek') && (*/}
-                <NativeTabs.Trigger name="tuesday"
-                    // hidden={!activeDays.has('Wtorek')}
-                >
+                <NativeTabs.Trigger name="tuesday">
                     <NativeTabs.Trigger.Label hidden={true}>Wtorek</NativeTabs.Trigger.Label>
                     <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/wt.png')} renderingMode="template" />
                 </NativeTabs.Trigger>
-                {/*)}*/}
 
-                {/*{activeDays.has('Środa') && (*/}
-                <NativeTabs.Trigger name="wednesday"
-                    // hidden={!activeDays.has('Środa')}
-                >
+                <NativeTabs.Trigger name="wednesday">
                     <NativeTabs.Trigger.Label hidden={true}>Środa</NativeTabs.Trigger.Label>
                     <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/sr.png')} renderingMode="template" />
                 </NativeTabs.Trigger>
 
-                {/*{activeDays.has('Czwartek') && (*/}
-                <NativeTabs.Trigger name="thursday"
-                    // hidden={!activeDays.has('Czwartek')}
-                >
+                <NativeTabs.Trigger name="thursday">
                     <NativeTabs.Trigger.Label hidden={true}>Czwartek</NativeTabs.Trigger.Label>
                     <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/cz.png')} renderingMode="template" />
                 </NativeTabs.Trigger>
-                {/*)}*/}
 
-                {/*{activeDays.has('Piątek') && (*/}
-                <NativeTabs.Trigger name="friday"
-                    // hidden={!activeDays.has('Piątek')}
-                >
+                <NativeTabs.Trigger name="friday">
                     <NativeTabs.Trigger.Label hidden={true}>Piątek</NativeTabs.Trigger.Label>
                     <NativeTabs.Trigger.Icon src={require('@/assets/images/weekIconsPL/pt.png')} renderingMode="template" />
                 </NativeTabs.Trigger>
-                {/*)}*/}
             </NativeTabs>
         )
     } else {

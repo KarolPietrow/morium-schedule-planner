@@ -1,15 +1,5 @@
 import { ParsedClass } from '@/types';
 
-const DAYS_MAP: Record<number, string> = {
-    1: 'Poniedziałek',
-    2: 'Wtorek',
-    3: 'Środa',
-    4: 'Czwartek',
-    5: 'Piątek',
-    6: 'Sobota',
-    7: 'Niedziela'
-};
-
 /**
  * Dodaje czas trwania do godziny rozpoczęcia.
  * Np. startTime: "08:15", duration: "01:30" => zwraca "09:45"
@@ -125,7 +115,7 @@ export const parseLegacySchedule = (rawXml: string): ParsedClass[] => {
                 type: typesMap[typeId] || 'Inne',
                 lecturer: lecturersMap[lecturerId] || '-',
                 room: roomsMap[roomId] || 'Brak sali',
-                day: DAYS_MAP[dayId] || 'Nieznany',
+                dayID: isNaN(dayId) ? -1 : dayId, // 1 - Poniedziałek, 7 - Niedziela
                 startTime,
                 endTime,
                 group: group && group !== '0' ? group : null,
@@ -134,10 +124,7 @@ export const parseLegacySchedule = (rawXml: string): ParsedClass[] => {
     });
 
     return parsedSchedule.sort((a, b) => {
-        const dayA = Object.keys(DAYS_MAP).find(key => DAYS_MAP[Number(key)] === a.day) || '8';
-        const dayB = Object.keys(DAYS_MAP).find(key => DAYS_MAP[Number(key)] === b.day) || '8';
-
-        if (dayA !== dayB) return Number(dayA) - Number(dayB);
+        if (a.dayID !== b.dayID) return a.dayID - b.dayID;
         return a.startTime.localeCompare(b.startTime);
     });
 };

@@ -9,6 +9,16 @@ import {fetchLegacySchedule, fetchSchedulesList} from "@/api/universityApi";
 import {useSchedule} from "@/context/ScheduleContext";
 import {parseLegacySchedule} from "@/utils/parser";
 
+const DAY_NAMES: Record<number, string> = {
+    1: 'Poniedziałek',
+    2: 'Wtorek',
+    3: 'Środa',
+    4: 'Czwartek',
+    5: 'Piątek',
+    6: 'Sobota',
+    7: 'Niedziela'
+};
+
 interface GroupedSubject {
     subjectName: string;
     classes: ParsedClass[];
@@ -142,7 +152,7 @@ export default function ManageScreen() {
                                             {cls.type} {cls.group ? `- Gr. ${cls.group}` : ''}
                                         </Text>
                                         <Text style={{ color: colors.text, opacity: 0.7, fontSize: 13, marginTop: 2 }}>
-                                            {cls.day}, {cls.startTime}-{cls.endTime} • {cls.room}
+                                            {DAY_NAMES[cls.dayID] || 'Nieznany'}, {cls.startTime}-{cls.endTime} • {cls.room}
                                         </Text>
                                         <Text style={{ color: colors.text, opacity: 0.7, fontSize: 13 }}>
                                             {cls.lecturer}
@@ -272,10 +282,7 @@ export default function ManageScreen() {
                     <FlatList
                         data={[...savedClasses].sort((a, b) => {
                             // Sortowanie zapisanych zajęć: najpierw po dniu, potem po godzinie
-                            const days: Record<string, number> = { 'Poniedziałek': 1, 'Wtorek': 2, 'Środa': 3, 'Czwartek': 4, 'Piątek': 5, 'Sobota': 6, 'Niedziela': 7 };
-                            const dayA = days[a.day] || 8;
-                            const dayB = days[b.day] || 8;
-                            if (dayA !== dayB) return dayA - dayB;
+                            if (a.dayID !== b.dayID) return a.dayID - b.dayID;
                             return a.startTime.localeCompare(b.startTime);
                         })}
                         keyExtractor={item => item.id}
@@ -295,7 +302,7 @@ export default function ManageScreen() {
                                         {item.type} {item.group ? `- Gr. ${item.group}` : ''}
                                     </Text>
                                     <Text style={{ color: colors.text, opacity: 0.7, fontSize: 13, marginTop: 4 }}>
-                                        {item.day}, {item.startTime}-{item.endTime} • {item.room}
+                                        {DAY_NAMES[item.dayID] || 'Nieznany'}, {item.startTime}-{item.endTime} • {item.room}
                                     </Text>
                                 </View>
                                 <TouchableOpacity

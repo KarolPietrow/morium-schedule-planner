@@ -9,8 +9,19 @@ import { SafeAreaView, useSafeAreaInsets, initialWindowMetrics } from 'react-nat
 import FreeDay from "@/components/FreeDay";
 import EmptyPlan from "@/components/EmptyPlan";
 
+// TODO: Tłumaczenie na inne języki
+const DAY_NAMES: Record<number, string> = {
+    1: 'Poniedziałek',
+    2: 'Wtorek',
+    3: 'Środa',
+    4: 'Czwartek',
+    5: 'Piątek',
+    6: 'Sobota',
+    7: 'Niedziela'
+};
+
 interface DayViewProps {
-    dayName: string; // Dzień tygodnia
+    dayID: number; // Dzień tygodnia
 }
 
 const HOUR_HEIGHT = 80; // Ile pikseli zajmuje jedna godzina na ekranie
@@ -22,7 +33,7 @@ const timeToMinutes = (time: string) => {
     return hours * 60 + minutes;
 };
 
-export default function DayView({ dayName }: DayViewProps) {
+export default function DayView({ dayID }: DayViewProps) {
     const { savedClasses, isLoading } = useSchedule();
     const { colors } = useTheme();
     const router = useRouter();
@@ -34,8 +45,10 @@ export default function DayView({ dayName }: DayViewProps) {
 
     const isPlanEmpty = savedClasses.length === 0;
 
+    const dayName = DAY_NAMES[dayID] || 'N/A';
+
     const dayClasses = savedClasses
-        .filter(c => c.day === dayName)
+        .filter(c => c.dayID === dayID)
         .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
     let minHour = 10;

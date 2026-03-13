@@ -1,5 +1,5 @@
 import DayView from "@/components/DayView";
 
 export default function Thursday() {
-    return <DayView dayName="Czwartek" />;
+    return <DayView dayID={4} />;
 }

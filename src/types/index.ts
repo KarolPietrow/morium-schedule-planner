@@ -9,7 +9,7 @@ export interface ParsedClass {
     type: string;
     lecturer: string;
     room: string;
-    day: string;
+    dayID: number;
     startTime: string;
     endTime: string;
     group: string | null;
