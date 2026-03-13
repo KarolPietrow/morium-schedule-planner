@@ -6,6 +6,8 @@ import { useTheme } from "@react-navigation/core";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView, useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
+import FreeDay from "@/components/FreeDay";
+import EmptyPlan from "@/components/EmptyPlan";
 
 interface DayViewProps {
     dayName: string; // Dzień tygodnia
@@ -28,7 +30,7 @@ export default function DayView({ dayName }: DayViewProps) {
 
     const topPadding = insets.top > 0
         ? insets.top
-        : (initialWindowMetrics?.insets.top ?? 47); // 47 is a safe fallback for modern iPhones
+        : (initialWindowMetrics?.insets.top ?? 47);
 
     const isPlanEmpty = savedClasses.length === 0;
 
@@ -49,19 +51,7 @@ export default function DayView({ dayName }: DayViewProps) {
     const hours = Array.from({ length: maxHour - minHour + 1 }, (_, i) => minHour + i);
 
     if (isPlanEmpty) {
-        return (
-            <View style={[styles.emptyContainer, { backgroundColor: colors.background, paddingTop: topPadding }]}>
-                <Ionicons name="calendar-clear-outline" size={64} color={colors.text} style={{ marginBottom: 16 }} />
-                <Text style={[styles.emptyTitle, { color: colors.text }]}>Twój plan jest pusty</Text>
-                <Text style={[styles.emptySubtitle, { color: colors.text }]}>
-                    Nie masz zaplanowanych żadnych zajęć. Dodaj coś do swojego planu, aby zacząć!
-                </Text>
-                <TouchableOpacity style={styles.addButton} onPress={() => router.push('/settings')}>
-                    <Ionicons name="add" size={24} color="#FFF" style={{ marginRight: 8 }} />
-                    <Text style={styles.addButtonText}>Dodaj zajęcia</Text>
-                </TouchableOpacity>
-            </View>
-        )
+        return <EmptyPlan/>
     }
 
     return (
@@ -79,9 +69,7 @@ export default function DayView({ dayName }: DayViewProps) {
             {isLoading ? (
                 <Text style={[styles.statusText, { color: colors.text }]}>Ładowanie...</Text>
             ) : (dayClasses.length === 0) ? (
-                <Text style={[styles.statusText, { color: colors.text, opacity: 0.5 }]}>
-                    Brak zajęć w tym dniu.
-                </Text>
+                <FreeDay/>
             ) : (
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
@@ -289,42 +277,5 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
         opacity: 0.8,
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 32,
-    },
-    emptyTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 12,
-        textAlign: 'center',
-    },
-    emptySubtitle: {
-        fontSize: 16,
-        opacity: 0.6,
-        textAlign: 'center',
-        marginBottom: 32,
-        lineHeight: 24,
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#4F46E5',
-        paddingVertical: 14,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        shadowColor: '#4F46E5',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
 });
