@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { useSchedule } from '@/context/ScheduleContext';
 import { ParsedClass } from '@/types';
@@ -38,6 +38,24 @@ export default function DayView({ dayID }: DayViewProps) {
     const { colors } = useTheme();
     const router = useRouter();
     const insets = useSafeAreaInsets();
+
+    const [currentTimeData, setCurrentTimeData] = useState({ isToday: false, minutes: 0 });
+
+    const updateTime = () => {
+        const plDate = new Date();
+        const jsDay = plDate.getDay();
+        const currentDayID = jsDay === 0 ? 7 : jsDay;
+        setCurrentTimeData({
+            isToday: currentDayID === dayID,
+            minutes: plDate.getHours() * 60 + plDate.getMinutes(),
+        });
+    };
+
+    useEffect(() => {
+        updateTime();
+        const interval = setInterval(updateTime, 60000);
+        return () => clearInterval(interval);
+    }, [dayID]);
 
     const topPadding = insets.top > 0
         ? insets.top
@@ -190,6 +208,21 @@ export default function DayView({ dayID }: DayViewProps) {
                                 </TouchableOpacity>
                             );
                         })}
+
+                        {currentTimeData.isToday && currentTimeData.minutes >= minHour * 60 && currentTimeData.minutes <= maxHour * 60 && (
+                            <View
+                                style={[
+                                    styles.currentTimeContainer,
+                                    {
+                                        top: (currentTimeData.minutes - minHour * 60) * PIXELS_PER_MINUTE
+                                    }
+                                ]}
+                            >
+                                {/*<View style={styles.currentTimeDot} />*/}
+                                <View style={styles.currentTimeLine} />
+                            </View>
+                        )}
+
                     </View>
                 </ScrollView>
             )}
@@ -292,5 +325,29 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
         opacity: 0.8,
+    },
+    currentTimeContainer: {
+        position: 'absolute',
+        // left: 45,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        // zIndex: 50,
+        zIndex: -1,
+        transform: [{ translateY: -4 }],
+    },
+    currentTimeDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#EF4444',
+        opacity: 1
+    },
+    currentTimeLine: {
+        flex: 1,
+        height: 3,
+        backgroundColor: '#EF4444',
+        opacity: 1
     },
 });

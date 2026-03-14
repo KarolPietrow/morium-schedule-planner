@@ -25,32 +25,6 @@ export const ScheduleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
             const storedData = await AsyncStorage.getItem(STORAGE_KEY);
             if (storedData) {
-                // <TEMP>: Convert old save style
-                let parsedData = JSON.parse(storedData);
-                let needsMigration = false;
-                const reverseDaysMap: Record<string, number> = {
-                    'Poniedziałek': 1, 'Wtorek': 2, 'Środa': 3,
-                    'Czwartek': 4, 'Piątek': 5, 'Sobota': 6, 'Niedziela': 7
-                };
-                parsedData = parsedData.map((cls: any) => {
-                    if (cls.day !== undefined) {
-                        needsMigration = true;
-                        const oldDayString = cls.day;
-                        const migratedCls = {
-                            ...cls,
-                            dayID: reverseDaysMap[oldDayString] || 8
-                        };
-                        delete migratedCls.day;
-                        return migratedCls;
-                    }
-                    return cls;
-                });
-                if (needsMigration) {
-                    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(parsedData));
-                }
-                console.log(parsedData);
-                // </TEMP>
-
                 setSavedClasses(JSON.parse(storedData));
             }
         } catch (error) {
