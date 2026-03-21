@@ -16,7 +16,6 @@ export const fetchSchedulesList = async (): Promise<ScheduleBasicInfo[]> => {
 
         const data = await response.json();
 
-        // API zwraca obiekt z polem "result", w którym jest "array"
         if (data.status === 'ok' && data.result && data.result.array) {
             return data.result.array;
         } else {

@@ -33,6 +33,14 @@ const timeToMinutes = (time: string) => {
     return hours * 60 + minutes;
 };
 
+const formatGapDuration = (mins: number) => {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h > 0 && m > 0) return `${h}h ${m}min okienka`;
+    if (h > 0) return `${h}h okienka`;
+    return `${m}min okienka`;
+};
+
 export default function DayView({ dayID }: DayViewProps) {
     const { savedClasses, isLoading } = useSchedule();
     const { colors } = useTheme();
@@ -83,6 +91,24 @@ export default function DayView({ dayID }: DayViewProps) {
 
     const hours = Array.from({ length: maxHour - minHour + 1 }, (_, i) => minHour + i);
 
+    const gaps = [];
+    for (let i = 0; i < dayClasses.length - 1; i++) {
+        const currentClass = dayClasses[i];
+        const nextClass = dayClasses[i + 1];
+
+        const endMins = timeToMinutes(currentClass.endTime);
+        const nextStartMins = timeToMinutes(nextClass.startTime);
+        const gapMins = nextStartMins - endMins;
+
+        if (gapMins >= 45) {
+            gaps.push({
+                id: `gap-${i}`,
+                startMins: endMins,
+                durationMins: gapMins,
+            });
+        }
+    }
+
     if (isPlanEmpty) {
         return <EmptyPlan/>
     }
@@ -111,7 +137,7 @@ export default function DayView({ dayID }: DayViewProps) {
                     {/* Główny kontener siatki */}
                     <View style={{ height: (maxHour - minHour) * HOUR_HEIGHT, position: 'relative', marginTop: 10 }}>
 
-                        {/* 1. Rysowanie linii godzinowych */}
+                        {/* Rysowanie linii godzinowych */}
                         {hours.map(hour => (
                             <View
                                 key={hour}
@@ -124,7 +150,27 @@ export default function DayView({ dayID }: DayViewProps) {
                             </View>
                         ))}
 
-                        {/* 2. Rysowanie kafelków zajęć */}
+                        {gaps.map(gap => (
+                            <View
+                                key={gap.id}
+                                style={[
+                                    styles.gapContainer,
+                                    {
+                                        top: (gap.startMins - minHour * 60) * PIXELS_PER_MINUTE,
+                                        height: gap.durationMins * PIXELS_PER_MINUTE,
+                                    }
+                                ]}
+                            >
+                                <View style={[styles.gapPill, { backgroundColor: colors.border }]}>
+                                    <Ionicons name="cafe-outline" size={14} color={colors.text} style={{ opacity: 0.8, marginRight: 6 }} />
+                                    <Text style={[styles.gapText, { color: colors.text }]}>
+                                        {formatGapDuration(gap.durationMins)}
+                                    </Text>
+                                </View>
+                            </View>
+                        ))}
+
+                        {/* Rysowanie kafelków zajęć */}
                         {dayClasses.map(cls => {
                             const startMins = timeToMinutes(cls.startTime);
                             const endMins = timeToMinutes(cls.endTime);
@@ -240,7 +286,7 @@ const styles = StyleSheet.create({
     manageButton: { padding: 4 },
     statusText: { textAlign: 'center', marginTop: 40, fontSize: 16 },
     scrollContent: {
-        paddingBottom: 120, // Miejsce pod paskiem dolnym
+        paddingBottom: 120,
     },
     gridLineContainer: {
         position: 'absolute',
@@ -255,7 +301,7 @@ const styles = StyleSheet.create({
         paddingRight: 8,
         fontSize: 12,
         opacity: 0.6,
-        marginTop: -7, // Wyrównanie tekstu do linii
+        marginTop: -7,
     },
     gridLine: {
         flex: 1,
@@ -269,7 +315,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         flexDirection: 'row',
-        overflow: 'hidden', // Gwarantuje ucinanie dolnych linijek, gdy kafelek jest mały
+        overflow: 'hidden',
     },
     cardIndicator: {
         width: 4,
@@ -279,7 +325,7 @@ const styles = StyleSheet.create({
     cardContent: {
         flex: 1,
         padding: 8,
-        justifyContent: 'flex-start', // Zmiana z 'center' na 'flex-start'
+        justifyContent: 'flex-start',
     },
     classSubject: {
         fontSize: 16,
@@ -350,4 +396,25 @@ const styles = StyleSheet.create({
         backgroundColor: '#EF4444',
         opacity: 1
     },
+    gapContainer: {
+        position: 'absolute',
+        left: 55,
+        right: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1,
+    },
+    gapPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        opacity: 0.8,
+    },
+    gapText: {
+        fontSize: 12,
+        fontWeight: '600',
+        opacity: 0.8,
+    }
 });
