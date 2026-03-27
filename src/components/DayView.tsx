@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator} from 'react-native';
 import { useSchedule } from '@/context/ScheduleContext';
-import { ParsedClass } from '@/types';
+import { RefreshResult } from '@/types';
 import { useTheme } from "@react-navigation/core";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,7 +42,7 @@ const formatGapDuration = (mins: number) => {
 };
 
 export default function DayView({ dayID }: DayViewProps) {
-    const { savedClasses, isLoading } = useSchedule();
+    const { savedClasses, isLoading, isRefreshing, refreshSchedule } = useSchedule();
     const { colors } = useTheme();
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -57,6 +57,22 @@ export default function DayView({ dayID }: DayViewProps) {
             isToday: currentDayID === dayID,
             minutes: plDate.getHours() * 60 + plDate.getMinutes(),
         });
+    };
+
+    const handleRefresh = async () => {
+        const result = await refreshSchedule();
+
+        switch (result) {
+            case 'UPDATED':
+                Alert.alert("Zaktualizowano plan", "Pobrano nowe dane z serwerów Moria.");
+                break;
+            case 'UP_TO_DATE':
+                Alert.alert("Plan aktualny", "Nie znaleziono zmian na serwerach Moria.");
+                break;
+            case 'FAILED':
+                Alert.alert("Błąd aktualizacji planu", "Upewnij się, że serwery Moria są dostępne.");
+                break;
+        }
     };
 
     useEffect(() => {
@@ -117,12 +133,26 @@ export default function DayView({ dayID }: DayViewProps) {
         <View style={[styles.container, { backgroundColor: colors.background, paddingTop: topPadding }]}>
             <View style={styles.header}>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>{dayName}</Text>
-                <TouchableOpacity
-                    onPress={() => router.push('/settings')}
-                    style={styles.manageButton}
-                >
-                    <Ionicons name="options-outline" size={28} color={colors.text} />
-                </TouchableOpacity>
+                <View style={styles.headerActions}>
+                    <TouchableOpacity
+                        onPress={handleRefresh}
+                        style={styles.actionButton}
+                        disabled={isRefreshing}
+                    >
+                        {isRefreshing ? (
+                            <ActivityIndicator size="small" color={colors.text} />
+                        ) : (
+                            <Ionicons name="refresh-outline" size={28} color={colors.text} />
+                        )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => router.push('/settings')}
+                        style={styles.actionButton}
+                    >
+                        <Ionicons name="options-outline" size={28} color={colors.text} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {isLoading ? (
@@ -416,5 +446,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '600',
         opacity: 0.8,
-    }
+    },
+    headerActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    actionButton: {
+        padding: 4,
+        marginLeft: 12,
+    },
 });

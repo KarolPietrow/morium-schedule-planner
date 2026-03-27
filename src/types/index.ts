@@ -27,3 +27,5 @@ export interface StudentsListApiResponse {
     };
     status: string;
 }
+
+export type RefreshResult = 'UPDATED' | 'UP_TO_DATE' | 'FAILED';
