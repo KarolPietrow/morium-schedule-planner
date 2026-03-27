@@ -215,6 +215,7 @@ export default function DayView({ dayID }: DayViewProps) {
                             return (
                                 <TouchableOpacity
                                     key={cls.id}
+                                    activeOpacity={0.8}
                                     style={[
                                         styles.classCard,
                                         {
