@@ -49,7 +49,7 @@ interface ClassCardProps {
     onPress: () => void;
 }
 
-const CARD_PADDING_VERTICAL = 14;
+const CARD_PADDING_VERTICAL = 19;
 
 function ClassCard({ cls, colors, topPosition, classHeight, onPress }: ClassCardProps) {
     const [contentHeight, setContentHeight] = useState(Infinity);
