@@ -41,6 +41,120 @@ const formatGapDuration = (mins: number) => {
     return `${m}min okienka`;
 };
 
+interface ClassCardProps {
+    cls: any;
+    colors: any;
+    topPosition: number;
+    classHeight: number;
+    onPress: () => void;
+}
+
+const CARD_PADDING_VERTICAL = 14;
+
+function ClassCard({ cls, colors, topPosition, classHeight, onPress }: ClassCardProps) {
+    const [contentHeight, setContentHeight] = useState(Infinity);
+    const [rowHeights, setRowHeights] = useState<Record<string, number>>({});
+
+    const startMins = timeToMinutes(cls.startTime);
+    const endMins = timeToMinutes(cls.endTime);
+    const durationMins = endMins - startMins;
+    const isShortClass = durationMins <= 55;
+
+
+    const setRowHeight = (key: string) => (e: any) => {
+        const h = e.nativeEvent.layout.height;
+        setRowHeights(prev => (prev[key] === h ? prev : { ...prev, [key]: h }));
+    };
+
+    const usable = contentHeight - CARD_PADDING_VERTICAL;
+
+    const hSubject  = rowHeights.subject   ?? 0;
+    const hTime     = rowHeights.time      ?? 0;
+    const hLecturer = rowHeights.lecturer  ?? 0;
+    const hPills    = rowHeights.pills     ?? 0;
+
+    let cumulative = hSubject;
+    const showTime     = cumulative + hTime     <= usable; if (showTime)     cumulative += hTime;
+    const showLecturer = showTime && cumulative + hLecturer <= usable; if (showLecturer) cumulative += hLecturer;
+    const showPills    = showLecturer && cumulative + hPills <= usable;
+
+    return (
+        <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+                styles.classCard,
+                {
+                    top: topPosition,
+                    height: classHeight,
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 2,
+                    elevation: 2,
+                }
+            ]}
+            onPress={onPress}
+        >
+            <View style={styles.cardIndicator} />
+            <View
+                style={styles.cardContent}
+                onLayout={e => setContentHeight(e.nativeEvent.layout.height)}
+            >
+                <Text
+                    style={[styles.classSubject, { color: colors.text }]}
+                    numberOfLines={isShortClass ? 1 : 2}
+                    onLayout={setRowHeight('subject')}
+                >
+                    {cls.subject}
+                </Text>
+
+
+                <View style={styles.detailsRow} onLayout={setRowHeight('time')}>
+                    <View style={styles.iconText}>
+                        <Ionicons name="time-outline" size={15} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.infoText, { color: colors.text }]}>
+                            {cls.startTime} - {cls.endTime}
+                        </Text>
+                    </View>
+                    <View style={[styles.iconText, { flexShrink: 1, paddingLeft: 8 }]}>
+                        <Ionicons name="location-outline" size={15} color={colors.text} style={styles.icon} />
+                        <Text style={[styles.infoText, { color: colors.text }]} numberOfLines={1}>
+                            {cls.room}
+                        </Text>
+                    </View>
+                </View>
+
+                {showLecturer && (
+                    <View style={styles.detailsRow} onLayout={setRowHeight('lecturer')}>
+                        <View style={[styles.iconText, { flexShrink: 1 }]}>
+                            <Ionicons name="person-outline" size={15} color={colors.text} style={styles.icon} />
+                            <Text style={[styles.infoText, { color: colors.text }]} numberOfLines={1}>
+                                {cls.lecturer}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+
+                {showPills && (
+                    <View style={styles.pillsRow} onLayout={setRowHeight('pills')}>
+                        <View style={[styles.pill, { backgroundColor: 'rgba(79, 70, 229, 0.1)' }]}>
+                            <Text style={styles.typePillText}>{cls.type}</Text>
+                        </View>
+                        {cls.group && (
+                            <View style={[styles.pill, { backgroundColor: 'rgba(100, 116, 139, 0.15)' }]}>
+                                <Text style={[styles.groupPillText, { color: colors.text }]}>Gr. {cls.group}</Text>
+                            </View>
+                        )}
+                    </View>
+                )}
+            </View>
+        </TouchableOpacity>
+    );
+}
+
+
 export default function DayView({ dayID }: DayViewProps) {
     const { savedClasses, isLoading, isRefreshing, refreshSchedule } = useSchedule();
     const { colors } = useTheme();
@@ -210,79 +324,16 @@ export default function DayView({ dayID }: DayViewProps) {
                             const topPosition = (startMins - minHour * 60) * PIXELS_PER_MINUTE;
                             const classHeight = durationMins * PIXELS_PER_MINUTE;
 
-                            const isShortClass = durationMins <= 55;
-
                             return (
-                                <TouchableOpacity
+                                <ClassCard
                                     key={cls.id}
-                                    activeOpacity={0.8}
-                                    style={[
-                                        styles.classCard,
-                                        {
-                                            top: topPosition,
-                                            height: classHeight,
-                                            backgroundColor: colors.card,
-                                            borderColor: colors.border,
-                                            shadowColor: '#000',
-                                            shadowOffset: { width: 0, height: 1 },
-                                            shadowOpacity: 0.1,
-                                            shadowRadius: 2,
-                                            elevation: 2,
-                                        }
-                                    ]}
+                                    cls={cls}
+                                    colors={colors}
+                                    topPosition={topPosition}
+                                    classHeight={classHeight}
                                     onPress={() => console.log('Kliknięto:', cls.subject)}
-                                >
-                                    <View style={styles.cardIndicator} />
-                                    <View style={styles.cardContent}>
-                                        {/* Linia 1: Przedmiot */}
-                                        <Text style={[styles.classSubject, { color: colors.text }]}
-                                              numberOfLines={isShortClass ? 1 : 2}
-                                        >
-                                            {cls.subject}
-                                        </Text>
+                                />
 
-                                        {/* Linia 2: Czas i Sala */}
-                                        <View style={styles.detailsRow}>
-                                            <View style={styles.iconText}>
-                                                <Ionicons name="time-outline" size={15} color={colors.text} style={styles.icon} />
-                                                <Text style={[styles.infoText, { color: colors.text }]}>
-                                                    {cls.startTime} - {cls.endTime}
-                                                </Text>
-                                            </View>
-                                            <View style={[styles.iconText, { flexShrink: 1, paddingLeft: 8 }]}>
-                                                <Ionicons name="location-outline" size={15} color={colors.text} style={styles.icon} />
-                                                <Text style={[styles.infoText, { color: colors.text }]} numberOfLines={1}>
-                                                    {cls.room}
-                                                </Text>
-                                            </View>
-                                        </View>
-
-                                        {!isShortClass && (
-                                            <>
-                                                <View style={styles.detailsRow}>
-                                                    <View style={[styles.iconText, { flexShrink: 1 }]}>
-                                                        <Ionicons name="person-outline" size={15} color={colors.text} style={styles.icon} />
-                                                        <Text style={[styles.infoText, { color: colors.text }]} numberOfLines={1}>
-                                                            {cls.lecturer}
-                                                        </Text>
-                                                    </View>
-                                                </View>
-
-                                                {/* Linia 4: Pigułki (Chipy) */}
-                                                <View style={styles.pillsRow}>
-                                                    <View style={[styles.pill, { backgroundColor: 'rgba(79, 70, 229, 0.1)' }]}>
-                                                        <Text style={styles.typePillText}>{cls.type}</Text>
-                                                    </View>
-                                                    {cls.group && (
-                                                        <View style={[styles.pill, { backgroundColor: 'rgba(100, 116, 139, 0.15)' }]}>
-                                                            <Text style={[styles.groupPillText, { color: colors.text }]}>Gr. {cls.group}</Text>
-                                                        </View>
-                                                    )}
-                                                </View>
-                                            </>
-                                        )}
-                                    </View>
-                                </TouchableOpacity>
                             );
                         })}
 
