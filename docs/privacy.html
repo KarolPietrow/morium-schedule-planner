@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morium</title>
+    <title>Morium - Polityka Prywatności</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -26,7 +26,7 @@
             color: #111;
             border-bottom: 2px solid #eaeaea;
             padding-bottom: 10px;
-            margin-top: 40px;
+            margin-top: 20px;
         }
         h2 {
             font-size: 18px;
@@ -43,31 +43,56 @@
             color: #666;
             margin-bottom: 30px;
         }
-        .lang-switcher {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 15px;
-            background-color: #f1f5f9;
-            border-radius: 8px;
-        }
-        .lang-switcher a {
-            color: #0366d6;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 15px;
-        }
-        .lang-switcher a:hover {
-            text-decoration: underline;
-        }
-        hr {
-            border: 0;
-            height: 1px;
-            background: #eaeaea;
-            margin: 50px 0;
-        }
         a {
             color: #0366d6;
+            text-decoration: none;
         }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .lang-switcher {
+            display: flex;
+            justify-content: center;
+            background-color: #f1f5f9;
+            padding: 4px;
+            border-radius: 30px;
+            width: fit-content;
+            margin: 0 auto 30px auto;
+        }
+        .lang-switcher button {
+            background: transparent;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 26px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.2s ease-in-out;
+        }
+        .lang-switcher button:hover {
+            color: #111;
+        }
+        .lang-switcher button.active {
+            background-color: #ffffff;
+            color: #0366d6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .lang-section {
+            display: none;
+        }
+        .lang-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -78,12 +103,13 @@
 <body>
 
 <div class="container">
-    
+
     <div class="lang-switcher">
-        <a href="#pl">Polski (PL)</a> | <a href="#en">English (EN)</a>
+        <button id="btn-pl" onclick="switchLang('pl')">Polski</button>
+        <button id="btn-en" onclick="switchLang('en')">English</button>
     </div>
 
-    <div id="pl">
+    <div id="pl" class="lang-section">
         <h1>Polityka Prywatności aplikacji Morium</h1>
         <p class="date">Ostatnia aktualizacja: 13.03.2026 r.</p>
 
@@ -106,15 +132,12 @@
         <p>W przypadku jakichkolwiek pytań, wątpliwości lub zgłoszeń dotyczących działania Aplikacji, kontakt jest możliwy pod adresem e-mail: <a href="mailto:karol.pietrow@icloud.com">karol.pietrow@icloud.com</a>.</p>
     </div>
 
-    <hr>
-
-    <div id="en">
+    <div id="en" class="lang-section">
         <h1>Morium App Privacy Policy</h1>
         <p class="date">Last updated: 2026-03-13</p>
 
         <h2>GENERAL</h2>
-        <p>This Privacy Policy sets out the rules for the operation and processing of information in the "Morium" mobile application ("App"). The App is an independent, unofficial project and is in no way affiliated with the Moria system or the Maria Curie-Skłodowska University in Lublin (UMCS).
-</p>
+        <p>This Privacy Policy sets out the rules for the operation and processing of information in the "Morium" mobile application ("App"). The App is an independent, unofficial project and is in no way affiliated with the Moria system or the Maria Curie-Skłodowska University in Lublin (UMCS).</p>
 
         <h2>DATA COLLECTION AND STORAGE</h2>
         <p>The App does not collect, process, store, or share any personal data on external servers. All user settings and preferences (such as selected fields of study, subjects, or groups) are saved only locally on the user's device.</p>
@@ -133,6 +156,28 @@
     </div>
 
 </div>
+
+<script>
+    function switchLang(lang) {
+        document.querySelectorAll('.lang-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.lang-switcher button').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(lang).classList.add('active');
+        document.getElementById('btn-' + lang).classList.add('active');
+
+        document.documentElement.lang = lang;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userLang = navigator.language || navigator.userLanguage;
+
+        if (userLang.toLowerCase().startsWith('pl')) {
+            switchLang('pl');
+        } else {
+            switchLang('en');
+        }
+    });
+</script>
 
 </body>
 </html>
