@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import {Platform, StatusBar, useColorScheme} from 'react-native';
-import React, {useEffect } from "react";
+import {Alert, Platform, StatusBar, useColorScheme} from 'react-native';
+import React, {useEffect, useRef} from "react";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { Stack } from "expo-router";
 import {ScheduleProvider, useSchedule} from "@/context/ScheduleContext";
@@ -16,6 +16,26 @@ export default function RootLayout() {
 
 function MainLayout() {
     const colorScheme = useColorScheme();
+
+    const { isLoading, savedClasses, refreshSchedule } = useSchedule();
+    const hasAutoRefreshed = useRef(false);
+
+    useEffect(() => {
+        if (!isLoading && !hasAutoRefreshed.current) {
+            hasAutoRefreshed.current = true;
+
+            const performAutoRefresh = async () => {
+                const result = await refreshSchedule();
+                if (result === 'UPDATED') {
+                    Alert.alert(
+                        "Zaktualizowano plan",
+                        "Pobrano nowe dane z serwerów Moria."
+                    );
+                }
+            };
+            performAutoRefresh();
+        }
+    }, [isLoading, refreshSchedule]);
 
     useEffect(() => {
         if (Platform.OS === 'android') {
