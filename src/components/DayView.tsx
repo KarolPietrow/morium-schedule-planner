@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator} from 'react-native';
+import React, {useEffect, useState, useRef} from 'react';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Modal, Animated} from 'react-native';
 import { useSchedule } from '@/context/ScheduleContext';
 import { RefreshResult } from '@/types';
 import { useTheme } from "@react-navigation/core";
@@ -154,6 +154,101 @@ function ClassCard({ cls, colors, topPosition, classHeight, onPress }: ClassCard
     );
 }
 
+interface ClassDetailsModalProps {
+    cls: any;
+    visible: boolean;
+    onClose: () => void;
+    colors: any;
+}
+
+function ClassDetailsModal({ cls, visible, onClose, colors }: ClassDetailsModalProps) {
+    const animValue = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (visible) {
+            Animated.spring(animValue, {
+                toValue: 1,
+                friction: 6,
+                tension: 40,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            animValue.setValue(0);
+        }
+    }, [visible]);
+
+    if (!cls) return null;
+
+    const rotateY = animValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['90deg', '0deg']
+    });
+
+    const scale = animValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0.5, 1]
+    });
+
+    return (
+        <Modal
+            visible={visible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={onClose}
+        >
+            <TouchableOpacity
+                style={styles.modalOverlay}
+                activeOpacity={1}
+                onPress={onClose}
+            >
+                <TouchableOpacity activeOpacity={1}>
+                    <Animated.View
+                        style={[
+                            styles.expandedCard,
+                            {
+                                backgroundColor: colors.card,
+                                borderColor: colors.border,
+                                transform: [{ perspective: 1000 }, { rotateY }, { scale }]
+                            }
+                        ]}
+                    >
+                        <View style={styles.expandedCardContent}>
+                            <Text style={[styles.expandedTitle, { color: colors.text }]}>{cls.subject}</Text>
+
+                            <View style={styles.expandedRow}>
+                                <Ionicons name="time" size={20} color="#4F46E5" />
+                                <Text style={[styles.expandedText, { color: colors.text }]}>{cls.startTime} - {cls.endTime}</Text>
+                            </View>
+
+                            <View style={styles.expandedRow}>
+                                <Ionicons name="location" size={20} color="#4F46E5" />
+                                <Text style={[styles.expandedText, { color: colors.text }]}>{cls.room}</Text>
+                            </View>
+
+                            <View style={styles.expandedRow}>
+                                <Ionicons name="person" size={20} color="#4F46E5" />
+                                <Text style={[styles.expandedText, { color: colors.text }]}>{cls.lecturer}</Text>
+                            </View>
+
+                            <View style={styles.expandedRow}>
+                                <Ionicons name="school" size={20} color="#4F46E5" />
+                                <Text style={[styles.expandedText, { color: colors.text }]}>{cls.type}</Text>
+                            </View>
+
+                            {cls.group && (
+                                <View style={styles.expandedRow}>
+                                    <Ionicons name="people" size={20} color="#4F46E5" />
+                                    <Text style={[styles.expandedText, { color: colors.text }]}>Gr. {cls.group}</Text>
+                                </View>
+                            )}
+                        </View>
+                    </Animated.View>
+                </TouchableOpacity>
+            </TouchableOpacity>
+        </Modal>
+    );
+}
+
 
 export default function DayView({ dayID }: DayViewProps) {
     const { savedClasses, isLoading, isRefreshing, refreshSchedule } = useSchedule();
@@ -162,6 +257,7 @@ export default function DayView({ dayID }: DayViewProps) {
     const insets = useSafeAreaInsets();
 
     const [currentTimeData, setCurrentTimeData] = useState({ isToday: false, minutes: 0 });
+    const [selectedClass, setSelectedClass] = useState<any | null>(null);
 
     const updateTime = () => {
         const plDate = new Date();
@@ -331,9 +427,8 @@ export default function DayView({ dayID }: DayViewProps) {
                                     colors={colors}
                                     topPosition={topPosition}
                                     classHeight={classHeight}
-                                    onPress={() => console.log('Kliknięto:', cls.subject)}
+                                    onPress={() => setSelectedClass(cls)}
                                 />
-
                             );
                         })}
 
@@ -346,14 +441,20 @@ export default function DayView({ dayID }: DayViewProps) {
                                     }
                                 ]}
                             >
-                                {/*<View style={styles.currentTimeDot} />*/}
                                 <View style={styles.currentTimeLine} />
                             </View>
                         )}
-
                     </View>
                 </ScrollView>
             )}
+
+            <ClassDetailsModal
+                cls={selectedClass}
+                visible={selectedClass !== null}
+                onClose={() => setSelectedClass(null)}
+                colors={colors}
+            />
+
         </View>
     );
 }
@@ -465,13 +566,6 @@ const styles = StyleSheet.create({
         zIndex: -1,
         transform: [{ translateY: -4 }],
     },
-    currentTimeDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#EF4444',
-        opacity: 1
-    },
     currentTimeLine: {
         flex: 1,
         height: 3,
@@ -506,5 +600,43 @@ const styles = StyleSheet.create({
     actionButton: {
         padding: 4,
         marginLeft: 12,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    expandedCard: {
+        width: '100%',
+        maxWidth: 350,
+        borderRadius: 16,
+        borderWidth: 1,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    expandedCardContent: {
+        padding: 24,
+    },
+    expandedTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    expandedRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    expandedText: {
+        fontSize: 16,
+        marginLeft: 12,
+        fontWeight: '500',
+        opacity: 0.9,
     },
 });
