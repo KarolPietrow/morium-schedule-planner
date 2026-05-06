@@ -1,3 +1,5 @@
+<img height="300" alt="morium-banner" src="https://github.com/user-attachments/assets/c62a921b-ea2a-4457-9e6e-a2a7476cc890" />
+
 # Morium
 #### Morium to nieoficjalna aplikacja mobilna dla systemu UMCS Moria.
 Wybierz kierunek, a następnie grupy zajęciowe, aby dopasować plan do siebie!
