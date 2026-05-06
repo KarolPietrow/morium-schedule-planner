@@ -2,40 +2,36 @@
   "expo": {
     "name": "Morium",
     "slug": "morium",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "morium",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/morium-icon-ios.icon",
       "bundleIdentifier": "pl.karolpietrow.morium",
       "userInterfaceStyle": "automatic"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
       "package": "pl.karolpietrow.morium",
       "userInterfaceStyle": "automatic"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/images/icon.png",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 200
         }
       ],
       "expo-image",

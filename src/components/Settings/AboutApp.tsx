@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, useColorScheme, Platform} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 
 export default function AboutApp() {
     const appVersion = Constants.expoConfig?.version || 'N/A';
+    const colorScheme = useColorScheme();
     const { colors } = useTheme();
 
     const handleOpenPrivacyPolicy = async () => {
@@ -18,6 +19,18 @@ export default function AboutApp() {
         });
     };
 
+    const getLogoSource = () => {
+        if (colorScheme === 'dark') {
+            return require('@/assets/images/morium-icon-dark.png');
+        }
+
+        if (Platform.OS === 'android') {
+            return require('@/assets/images/icon.png');
+        } else {
+            return require('@/assets/images/morium-icon-light.png');
+        }
+    };
+
     return (
         <ScrollView
             contentContainerStyle={styles.container}
@@ -25,7 +38,7 @@ export default function AboutApp() {
         >
             <View style={styles.header}>
                 <Image
-                    source={require('@/assets/images/icon.png')}
+                    source={ getLogoSource() }
                     style={styles.logo}
                     resizeMode="cover"
                 />
